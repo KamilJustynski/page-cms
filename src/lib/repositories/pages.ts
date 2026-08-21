@@ -1,4 +1,4 @@
-import type { Page } from "@/types/page";
+import type { Page, PageInput } from "@/types/page";
 
 const pages: Page[] = [
   {
@@ -29,4 +29,19 @@ const pages: Page[] = [
 
 export async function listPages(): Promise<Page[]> {
   return [...pages];
+}
+
+export async function createPage(page: PageInput): Promise<Page> {
+  const dateNow = new Date().toISOString();
+  const { slug, title, status = "draft" } = page;
+  const newPage = {
+    slug,
+    title,
+    status,
+    id: crypto.randomUUID(),
+    createdAt: dateNow,
+    updatedAt: dateNow,
+  };
+  pages.push(newPage);
+  return newPage;
 }

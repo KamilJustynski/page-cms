@@ -6,3 +6,10 @@ export type Page = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type PageInput = Omit<
+  Page,
+  "id" | "createdAt" | "updatedAt" | "status"
+> & {
+  status?: Page["status"];
+};
