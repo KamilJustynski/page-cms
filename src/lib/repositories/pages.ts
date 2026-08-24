@@ -1,4 +1,5 @@
 import type { Page, PageInput } from "@/types/page";
+import { SlugConflictError } from "@/lib/errors";
 
 const pages: Page[] = [
   {
@@ -32,8 +33,13 @@ export async function listPages(): Promise<Page[]> {
 }
 
 export async function createPage(page: PageInput): Promise<Page> {
-  const dateNow = new Date().toISOString();
   const { slug, title, status = "draft" } = page;
+
+  if (pages.some((p) => p.slug === slug)) {
+    throw new SlugConflictError(slug);
+  }
+
+  const dateNow = new Date().toISOString();
   const newPage = {
     slug,
     title,
@@ -42,6 +48,7 @@ export async function createPage(page: PageInput): Promise<Page> {
     createdAt: dateNow,
     updatedAt: dateNow,
   };
+
   pages.push(newPage);
   return newPage;
 }
