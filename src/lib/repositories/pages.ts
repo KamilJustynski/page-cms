@@ -56,3 +56,33 @@ export async function createPage(page: PageInput): Promise<Page> {
 export async function getPageById(id: string): Promise<Page | null> {
   return pages.find((p) => p.id === id) || null;
 }
+
+export async function patchPage(
+  id: string,
+  updates: Partial<PageInput>,
+): Promise<Page | null> {
+  const { slug, title, status } = updates;
+  const pageIndex = pages.findIndex((p) => p.id === id);
+  const existingPage = pages[pageIndex];
+
+  if (!existingPage) {
+    return null;
+  }
+
+  if (slug && slug !== existingPage.slug) {
+    if (pages.some((p) => p.slug === slug)) {
+      throw new SlugConflictError(slug);
+    }
+  }
+
+  const updatedPage = {
+    ...existingPage,
+    slug: slug ?? existingPage.slug,
+    title: title ?? existingPage.title,
+    status: status ?? existingPage.status,
+    updatedAt: new Date().toISOString(),
+  };
+
+  pages[pageIndex] = updatedPage;
+  return updatedPage;
+}
