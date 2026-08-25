@@ -86,3 +86,15 @@ export async function patchPage(
   pages[pageIndex] = updatedPage;
   return updatedPage;
 }
+
+export async function deletePage(id: string): Promise<boolean> {
+  const pageIndex = pages.findIndex((p) => p.id === id);
+  const existingPage = pages[pageIndex];
+
+  if (!existingPage) {
+    return false;
+  }
+
+  pages.splice(pageIndex, 1);
+  return true;
+}

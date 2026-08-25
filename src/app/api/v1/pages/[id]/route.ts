@@ -1,4 +1,4 @@
-import { getPageById, patchPage } from "@/lib/repositories/pages";
+import { getPageById, patchPage, deletePage } from "@/lib/repositories/pages";
 import { problemResponse } from "@/lib/http/problem";
 import { SlugConflictError } from "@/lib/errors";
 
@@ -62,6 +62,34 @@ export async function PATCH(
       title: "Internal Server Error",
       status: 500,
       detail: "Failed to update page",
+      code: "SERVER_ERROR",
+    });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const deletedPage = await deletePage(id);
+    if (!deletedPage) {
+      return problemResponse({
+        title: "Not Found",
+        status: 404,
+        detail: `Page with id "${id}" not found.`,
+        code: "NOT_FOUND",
+      });
+    }
+
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    console.error(error);
+    return problemResponse({
+      title: "Internal Server Error",
+      status: 500,
+      detail: "Failed to delete page",
       code: "SERVER_ERROR",
     });
   }
