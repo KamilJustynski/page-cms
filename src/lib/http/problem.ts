@@ -1,4 +1,5 @@
-export type ProblemCode = "SERVER_ERROR" | "INVALID_JSON" | "SLUG_CONFLICT";
+export type ProblemCode =
+  "SERVER_ERROR" | "INVALID_JSON" | "SLUG_CONFLICT" | "NOT_FOUND";
 
 export type Problem = {
   type: string;

@@ -52,3 +52,7 @@ export async function createPage(page: PageInput): Promise<Page> {
   pages.push(newPage);
   return newPage;
 }
+
+export async function getPageById(id: string): Promise<Page | null> {
+  return pages.find((p) => p.id === id) || null;
+}
