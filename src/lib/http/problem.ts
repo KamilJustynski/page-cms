@@ -1,5 +1,14 @@
 export type ProblemCode =
-  "SERVER_ERROR" | "INVALID_JSON" | "SLUG_CONFLICT" | "NOT_FOUND";
+  | "SERVER_ERROR"
+  | "INVALID_JSON"
+  | "SLUG_CONFLICT"
+  | "NOT_FOUND"
+  | "INVALID_DATA";
+
+export type InvalidField = {
+  name: string;
+  reason: string;
+};
 
 export type Problem = {
   type: string;
@@ -7,6 +16,7 @@ export type Problem = {
   status: number;
   detail?: string;
   code: ProblemCode;
+  invalidFields?: InvalidField[];
 };
 
 export type ProblemInput = Omit<Problem, "type">;
