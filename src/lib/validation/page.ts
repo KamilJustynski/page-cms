@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+export const statusEnum = z.enum(["draft", "published", "archived"]);
+
 export const createPageSchema = z.object({
   title: z
     .string()
@@ -15,10 +17,15 @@ export const createPageSchema = z.object({
       /^[a-z0-9]+(-[a-z0-9]+)*$/,
       "Slug must be lowercase, alphanumeric, and can include hyphens between words",
     ),
-  status: z
-    .enum(
-      ["draft", "published", "archived"],
-      "Status must be one of: draft, published, archived",
-    )
-    .optional(),
+  status: statusEnum.optional(),
 });
+
+export const updatePageSchema = createPageSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided for update",
+  });
+
+export type CreatePageInput = z.infer<typeof createPageSchema>;
+export type UpdatePageInput = z.infer<typeof updatePageSchema>;
+export type Status = z.infer<typeof statusEnum>;

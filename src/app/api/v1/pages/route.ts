@@ -1,6 +1,6 @@
 import { SlugConflictError } from "@/lib/errors";
 import { listPages, createPage } from "@/lib/repositories/pages";
-import { problemResponse } from "@/lib/http/problem";
+import { problemResponse, validationProblem } from "@/lib/http/problem";
 import { createPageSchema } from "@/lib/validation/page";
 
 export async function GET() {
@@ -13,18 +13,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const parsedBody = createPageSchema.safeParse(body);
 
-    if (!parsedBody.success) {
-      return problemResponse({
-        title: "Bad Request",
-        status: 400,
-        detail: parsedBody.error.issues.map((e) => e.message).join(", "),
-        code: "INVALID_DATA",
-        invalidFields: parsedBody.error.issues.map((e) => ({
-          name: e.path.join("."),
-          reason: e.message,
-        })),
-      });
-    }
+    if (!parsedBody.success) return validationProblem(parsedBody.error);
 
     const newPage = await createPage(parsedBody.data);
 
