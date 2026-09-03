@@ -1,5 +1,6 @@
-import type { Page, PageInput } from "@/types/page";
+import type { Page } from "@/types/page";
 import { SlugConflictError } from "@/lib/errors";
+import type { CreatePageInput, UpdatePageInput } from "@/lib/validation/page";
 
 const pages: Page[] = [
   {
@@ -32,7 +33,7 @@ export async function listPages(): Promise<Page[]> {
   return [...pages];
 }
 
-export async function createPage(page: PageInput): Promise<Page> {
+export async function createPage(page: CreatePageInput): Promise<Page> {
   const { slug, title, status = "draft" } = page;
 
   if (pages.some((p) => p.slug === slug)) {
@@ -59,7 +60,7 @@ export async function getPageById(id: string): Promise<Page | null> {
 
 export async function patchPage(
   id: string,
-  updates: Partial<PageInput>,
+  updates: Partial<UpdatePageInput>,
 ): Promise<Page | null> {
   const { slug, title, status } = updates;
   const pageIndex = pages.findIndex((p) => p.id === id);

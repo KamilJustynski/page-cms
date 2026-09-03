@@ -1,6 +1,7 @@
 import { getPageById, patchPage, deletePage } from "@/lib/repositories/pages";
-import { problemResponse } from "@/lib/http/problem";
+import { problemResponse, validationProblem } from "@/lib/http/problem";
 import { SlugConflictError } from "@/lib/errors";
+import { updatePageSchema } from "@/lib/validation/page";
 
 export async function GET(
   request: Request,
@@ -28,7 +29,12 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const updatedPage = await patchPage(id, body);
+    const parsedBody = updatePageSchema.safeParse(body);
+
+    if (!parsedBody.success) return validationProblem(parsedBody.error);
+
+    const updatedPage = await patchPage(id, parsedBody.data);
+
     if (!updatedPage) {
       return problemResponse({
         title: "Not Found",

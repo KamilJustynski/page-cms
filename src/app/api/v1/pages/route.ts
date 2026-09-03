@@ -1,6 +1,7 @@
 import { SlugConflictError } from "@/lib/errors";
 import { listPages, createPage } from "@/lib/repositories/pages";
-import { problemResponse } from "@/lib/http/problem";
+import { problemResponse, validationProblem } from "@/lib/http/problem";
+import { createPageSchema } from "@/lib/validation/page";
 
 export async function GET() {
   const pages = await listPages();
@@ -10,8 +11,11 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const parsedBody = createPageSchema.safeParse(body);
 
-    const newPage = await createPage(body);
+    if (!parsedBody.success) return validationProblem(parsedBody.error);
+
+    const newPage = await createPage(parsedBody.data);
 
     return Response.json(newPage, {
       headers: {
