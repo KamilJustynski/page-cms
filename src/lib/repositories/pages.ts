@@ -30,14 +30,14 @@ export async function getPageById(id: string): Promise<Page | null> {
 
 export async function patchPage(
   id: string,
-  updates: Partial<UpdatePageInput>,
+  updates: UpdatePageInput,
 ): Promise<Page | null> {
   const { slug, title, status } = updates;
 
   try {
     return await prisma.page.update({
       where: { id },
-      data: { slug, title, status, updatedAt: new Date() },
+      data: { slug, title, status },
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

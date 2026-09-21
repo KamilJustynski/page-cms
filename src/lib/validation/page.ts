@@ -1,6 +1,7 @@
 import * as z from "zod";
+import { PageStatus } from "@/generated/prisma/enums";
 
-export const statusEnum = z.enum(["draft", "published", "archived"]);
+export const statusEnum = z.enum(PageStatus);
 
 export const createPageSchema = z.object({
   title: z
