@@ -1,30 +1,10 @@
 import * as z from "zod";
+import { ProblemSchema } from "../validation/page";
 
-export type ProblemCode =
-  | "SERVER_ERROR"
-  | "INVALID_JSON"
-  | "SLUG_CONFLICT"
-  | "NOT_FOUND"
-  | "INVALID_DATA";
-
-export type InvalidField = {
-  name: string;
-  reason: string;
-};
-
-export type Problem = {
-  type: string;
-  title: string;
-  status: number;
-  detail?: string;
-  code: ProblemCode;
-  invalidFields?: InvalidField[];
-};
-
-export type ProblemInput = Omit<Problem, "type">;
+export type ProblemInput = Omit<ProblemSchema, "type">;
 
 export function problemResponse(input: ProblemInput): Response {
-  const problem: Problem = {
+  const problem: ProblemSchema = {
     ...input,
     type: "about:blank",
   };

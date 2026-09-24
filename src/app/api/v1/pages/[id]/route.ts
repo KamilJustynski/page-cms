@@ -1,13 +1,17 @@
 import { getPageById, patchPage, deletePage } from "@/lib/repositories/pages";
 import { problemResponse, validationProblem } from "@/lib/http/problem";
 import { SlugConflictError } from "@/lib/errors";
-import { updatePageSchema } from "@/lib/validation/page";
+import { pageParamsSchema, updatePageSchema } from "@/lib/validation/page";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
+  const parsedParams = pageParamsSchema.safeParse(await params);
+
+  if (!parsedParams.success) return validationProblem(parsedParams.error);
+
+  const { id } = parsedParams.data;
   const page = await getPageById(id);
 
   if (!page) {
@@ -27,7 +31,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const parsedParams = pageParamsSchema.safeParse(await params);
+    if (!parsedParams.success) return validationProblem(parsedParams.error);
+    const { id } = parsedParams.data;
     const body = await request.json();
     const parsedBody = updatePageSchema.safeParse(body);
 
@@ -78,7 +84,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
+    const parsedParams = pageParamsSchema.safeParse(await params);
+    if (!parsedParams.success) return validationProblem(parsedParams.error);
+    const { id } = parsedParams.data;
     const deletedPage = await deletePage(id);
     if (!deletedPage) {
       return problemResponse({
