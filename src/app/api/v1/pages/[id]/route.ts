@@ -2,6 +2,7 @@ import { getPageById, patchPage, deletePage } from "@/lib/repositories/pages";
 import { problemResponse, validationProblem } from "@/lib/http/problem";
 import { SlugConflictError } from "@/lib/errors";
 import { pageParamsSchema, updatePageSchema } from "@/lib/validation/page";
+import { requireAuth } from "@/lib/auth/guard";
 
 export async function GET(
   request: Request,
@@ -31,6 +32,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const parsedParams = pageParamsSchema.safeParse(await params);
     if (!parsedParams.success) return validationProblem(parsedParams.error);
     const { id } = parsedParams.data;
@@ -84,6 +87,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const parsedParams = pageParamsSchema.safeParse(await params);
     if (!parsedParams.success) return validationProblem(parsedParams.error);
     const { id } = parsedParams.data;
