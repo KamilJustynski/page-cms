@@ -2,6 +2,7 @@ import { SlugConflictError } from "@/lib/errors";
 import { listPages, createPage } from "@/lib/repositories/pages";
 import { problemResponse, validationProblem } from "@/lib/http/problem";
 import { createPageSchema } from "@/lib/validation/page";
+import { requireAuth } from "@/lib/auth/guard";
 
 export async function GET() {
   const pages = await listPages();
@@ -10,6 +11,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const body = await request.json();
     const parsedBody = createPageSchema.safeParse(body);
 

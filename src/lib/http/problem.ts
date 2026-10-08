@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { ProblemSchema } from "../validation/page";
+import type { ProblemSchema } from "../validation/page";
 
 export type ProblemInput = Omit<ProblemSchema, "type">;
 

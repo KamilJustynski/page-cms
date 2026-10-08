@@ -16,7 +16,16 @@ export const openApiDocument = createDocument({
     description: "REST API for managing CMS pages.",
   },
   servers: [{ url: "http://localhost:4000" }],
-
+  components: {
+    securitySchemes: {
+      sessionCookie: {
+        type: "apiKey",
+        in: "cookie",
+        name: "authjs.session-token",
+        description: "Session cookie set after signing in at /api/auth/signin",
+      },
+    },
+  },
   paths: {
     "/api/v1/pages": {
       get: {
@@ -34,6 +43,7 @@ export const openApiDocument = createDocument({
       },
       post: {
         summary: "Create a page",
+        security: [{ sessionCookie: [] }],
         requestBody: {
           content: {
             "application/json": {
@@ -55,6 +65,12 @@ export const openApiDocument = createDocument({
           },
           "400": {
             description: "Invalid JSON or validation failed",
+            content: {
+              "application/problem+json": { schema: problemSchema },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
             content: {
               "application/problem+json": { schema: problemSchema },
             },
@@ -103,6 +119,7 @@ export const openApiDocument = createDocument({
       },
       patch: {
         summary: "Update a page by id",
+        security: [{ sessionCookie: [] }],
         requestBody: {
           content: {
             "application/json": {
@@ -124,6 +141,12 @@ export const openApiDocument = createDocument({
           },
           "400": {
             description: "Invalid page id",
+            content: {
+              "application/problem+json": { schema: problemSchema },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
             content: {
               "application/problem+json": { schema: problemSchema },
             },
@@ -150,6 +173,7 @@ export const openApiDocument = createDocument({
       },
       delete: {
         summary: "Delete a page by id",
+        security: [{ sessionCookie: [] }],
         requestParams: {
           path: pageParamsSchema,
         },
@@ -159,6 +183,12 @@ export const openApiDocument = createDocument({
           },
           "400": {
             description: "Invalid page id",
+            content: {
+              "application/problem+json": { schema: problemSchema },
+            },
+          },
+          "401": {
+            description: "Unauthorized",
             content: {
               "application/problem+json": { schema: problemSchema },
             },

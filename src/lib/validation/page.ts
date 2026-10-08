@@ -53,6 +53,7 @@ export const problemSchema = z
       "SLUG_CONFLICT",
       "NOT_FOUND",
       "INVALID_DATA",
+      "UNAUTHORIZED",
     ]),
     invalidFields: z
       .array(z.object({ name: z.string(), reason: z.string() }))
