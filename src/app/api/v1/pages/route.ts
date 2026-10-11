@@ -1,6 +1,5 @@
-import { SlugConflictError } from "@/lib/errors";
 import { listPages, createPage } from "@/lib/repositories/pages";
-import { problemResponse, validationProblem } from "@/lib/http/problem";
+import { errorProblem, validationProblem } from "@/lib/http/problem";
 import { createPageSchema } from "@/lib/validation/page";
 import { requireAuth } from "@/lib/auth/guard";
 
@@ -27,29 +26,6 @@ export async function POST(request: Request) {
       status: 201,
     });
   } catch (error) {
-    if (error instanceof SlugConflictError) {
-      return problemResponse({
-        title: "Conflict",
-        status: 409,
-        detail: error.message,
-        code: "SLUG_CONFLICT",
-      });
-    }
-
-    if (error instanceof SyntaxError) {
-      return problemResponse({
-        title: "Bad Request",
-        status: 400,
-        detail: "The request body contains invalid JSON.",
-        code: "INVALID_JSON",
-      });
-    }
-    console.error(error);
-    return problemResponse({
-      title: "Internal Server Error",
-      status: 500,
-      detail: "Failed to create page",
-      code: "SERVER_ERROR",
-    });
+    return errorProblem(error, "Failed to create page");
   }
 }
