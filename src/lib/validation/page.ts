@@ -55,6 +55,7 @@ export const problemSchema = z
       "INVALID_DATA",
       "UNAUTHORIZED",
       "BLOCK_TYPE_MISMATCH",
+      "BLOCK_ORDER_MISMATCH",
     ]),
     invalidFields: z
       .array(z.object({ name: z.string(), reason: z.string() }))

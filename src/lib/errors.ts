@@ -21,3 +21,14 @@ export class BlockTypeMismatchError extends Error {
     Object.setPrototypeOf(this, BlockTypeMismatchError.prototype);
   }
 }
+
+export class BlockOrderMismatchError extends Error {
+  constructor(public readonly pageId: string) {
+    super(
+      `The submitted block order does not match the blocks on this page. ` +
+        `Send every block of the page exactly once, in the desired order.`,
+    );
+    this.name = "BlockOrderMismatchError";
+    Object.setPrototypeOf(this, BlockOrderMismatchError.prototype);
+  }
+}

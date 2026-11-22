@@ -2,7 +2,7 @@ import type { Block } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { CreateBlockInput, UpdateBlockInput } from "../validation/block";
-import { BlockTypeMismatchError } from "../errors";
+import { BlockTypeMismatchError, BlockOrderMismatchError } from "../errors";
 
 export async function listBlocks(pageId: string): Promise<Block[]> {
   return prisma.block.findMany({
@@ -80,4 +80,43 @@ export async function deleteBlock(id: string): Promise<boolean> {
     }
     throw error;
   }
+}
+
+export async function reorderBlocks(
+  pageId: string,
+  blockIds: string[],
+): Promise<Block[] | null> {
+  return prisma.$transaction(async (tx) => {
+    const page = await tx.page.findUnique({
+      where: { id: pageId },
+      select: { id: true },
+    });
+    if (!page) return null;
+
+    const existing = await tx.block.findMany({
+      where: { pageId },
+      select: { id: true },
+    });
+
+    const existingIds = new Set(existing.map((block) => block.id));
+    const requestedIds = new Set(blockIds);
+
+    const isSameSet =
+      blockIds.length === existingIds.size &&
+      requestedIds.size === blockIds.length &&
+      [...requestedIds].every((id) => existingIds.has(id));
+
+    if (!isSameSet) {
+      throw new BlockOrderMismatchError(pageId);
+    }
+
+    for (const [index, id] of blockIds.entries()) {
+      await tx.block.update({ where: { id }, data: { position: index } });
+    }
+
+    return tx.block.findMany({
+      where: { pageId },
+      orderBy: { position: "asc" },
+    });
+  });
 }
