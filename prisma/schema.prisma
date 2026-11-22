@@ -19,6 +19,7 @@ model Page {
   status    PageStatus @default(draft)
   createdAt DateTime   @default(now()) @db.Timestamptz(6) @map("created_at")
   updatedAt DateTime   @default(now()) @updatedAt @db.Timestamptz(6) @map("updated_at")
+  blocks    Block[]
 
   @@map("pages")
 }
@@ -39,4 +40,18 @@ model User {
   updatedAt    DateTime @default(now()) @updatedAt @db.Timestamptz(6) @map("updated_at")
 
   @@map("users")
+}
+
+model Block {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(6) @map("updated_at")
+  pageId      String   @map("page_id") @db.Uuid
+  type        String
+  position    Int
+  data        Json
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, position])
+  @@map("blocks")
 }

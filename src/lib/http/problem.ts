@@ -1,6 +1,10 @@
 import * as z from "zod";
 import type { ProblemSchema } from "../validation/page";
-import { SlugConflictError } from "@/lib/errors";
+import {
+  BlockTypeMismatchError,
+  SlugConflictError,
+  BlockOrderMismatchError,
+} from "@/lib/errors";
 
 export type ProblemInput = Omit<ProblemSchema, "type">;
 
@@ -58,6 +62,24 @@ export function errorProblem(error: unknown, detail: string): Response {
       status: 400,
       detail: "The request body contains invalid JSON.",
       code: "INVALID_JSON",
+    });
+  }
+
+  if (error instanceof BlockTypeMismatchError) {
+    return problemResponse({
+      title: "Conflict",
+      status: 409,
+      detail: error.message,
+      code: "BLOCK_TYPE_MISMATCH",
+    });
+  }
+
+  if (error instanceof BlockOrderMismatchError) {
+    return problemResponse({
+      title: "Conflict",
+      status: 409,
+      detail: error.message,
+      code: "BLOCK_ORDER_MISMATCH",
     });
   }
 
